@@ -376,8 +376,11 @@
     .body-grid { flex-direction: column; }
     .sidebar { width: 100%; min-width: unset; }
     .main-panel { padding: 24px 20px; }
-    .scale-row { flex-wrap: wrap; gap: 8px; }
-    .scale-option { flex: 0 0 calc(20% - 8px); border-radius: 8px !important; border-right: 1px solid #e2e4e8 !important; }
+    .scale-row { flex-wrap: nowrap; gap: 0; }
+    .scale-option { flex: 1; min-width: 0; padding: 10px 2px 8px; border-radius: 0 !important; border-right: none !important; border: 1px solid #e2e4e8; border-right: none; }
+    .scale-option:first-child { border-radius: 8px 0 0 8px !important; }
+    .scale-option:last-child { border-radius: 0 8px 8px 0 !important; border-right: 1px solid #e2e4e8 !important; }
+    .scale-label { font-size: 8px; }
     .form-grid { grid-template-columns: 1fr; }
     .dimension-scores { grid-template-columns: 1fr; }
   }
