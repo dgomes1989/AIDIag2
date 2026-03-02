@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kauai Diagnóstico de Prontidão para IA</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: #f7f8fa;
+    color: #1a1a2e;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  #app {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 24px;
+  }
+
+  /* ── Header ── */
+  .header-card {
+    background: #fff;
+    border: 1px solid #e2e4e8;
+    border-radius: 12px;
+    padding: 36px 40px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 40px;
+  }
+  .header-brand {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #1a5c57;
+    margin-bottom: 8px;
+  }
+  .header-title {
+    font-size: 36px;
+    font-weight: 800;
+    line-height: 1.15;
+    color: #0f172a;
+  }
+  .header-tagline {
+    font-size: 15px;
+    color: #555;
+    max-width: 380px;
+    padding-top: 12px;
+  }
+
+  /* ── Body layout ── */
+  .body-grid {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 280px;
+    min-width: 280px;
+    background: #fff;
+    border: 1px solid #e2e4e8;
+    border-radius: 12px;
+    padding: 28px 24px;
+  }
+  .sidebar h2 { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+  .sidebar p { font-size: 14px; color: #555; margin-bottom: 18px; }
+  .sidebar-stat {
+    background: #f7f8fa;
+    border-left: 3px solid #1a5c57;
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+  }
+  .sidebar-stat-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #777;
+  }
+  .sidebar-stat-value { font-size: 18px; font-weight: 700; color: #0f172a; }
+  .sidebar-focus {
+    background: #f0faf9;
+    border-left: 3px solid #1a5c57;
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-top: 10px;
+    font-size: 13px;
+    color: #1a5c57;
+    line-height: 1.5;
+  }
+
+  /* ── Main panel ── */
+  .main-panel {
+    flex: 1;
+    background: #fff;
+    border: 1px solid #e2e4e8;
+    border-radius: 12px;
+    padding: 32px 36px;
+    min-height: 400px;
+  }
+  .main-panel h2 { font-size: 24px; font-weight: 700; margin-bottom: 12px; }
+
+  /* ── Start screen ── */
+  .start-instructions { font-size: 15px; color: #555; margin-bottom: 28px; }
+  .start-instructions b { color: #0f172a; }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: #1a5c57; color: #fff; }
+  .btn-primary:hover { background: #155a52; }
+  .btn-secondary { background: transparent; color: #555; border: 1px solid #d0d3d9; }
+  .btn-secondary:hover { background: #f7f8fa; }
+
+  /* ── Progress bar ── */
+  .progress-bar-wrap {
+    height: 6px;
+    background: #e8eaed;
+    border-radius: 3px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #1a5c57, #2a9d8f);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+  }
+
+  /* ── Quiz header ── */
+  .quiz-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .quiz-header h2 { margin-bottom: 0; }
+  .quiz-counter { font-size: 14px; color: #888; }
+
+  .dimension-badge {
+    display: inline-block;
+    background: #e6f5f3;
+    color: #1a5c57;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+
+  /* ── Question ── */
+  .question-text {
+    font-size: 17px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 6px;
+  }
+  .question-sub {
+    font-size: 14px;
+    color: #777;
+    margin-bottom: 24px;
+  }
+
+  /* ── Radio scale ── */
+  .scale-row {
+    display: flex;
+    gap: 0;
+    margin-bottom: 16px;
+  }
+  .scale-option {
+    flex: 1;
+    text-align: center;
+    cursor: pointer;
+    padding: 14px 4px 10px;
+    border: 1px solid #e2e4e8;
+    border-right: none;
+    transition: background 0.15s, border-color 0.15s;
+    position: relative;
+  }
+  .scale-option:first-child { border-radius: 8px 0 0 8px; }
+  .scale-option:last-child { border-radius: 0 8px 8px 0; border-right: 1px solid #e2e4e8; }
+  .scale-option:hover { background: #f7f8fa; }
+  .scale-option.selected {
+    background: #e6f5f3;
+    border-color: #1a5c57;
+    z-index: 1;
+  }
+  .scale-option.selected + .scale-option { border-left-color: #1a5c57; }
+  .scale-option input { display: none; }
+  .scale-radio {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #ccc;
+    border-radius: 50%;
+    margin-bottom: 6px;
+    position: relative;
+  }
+  .scale-radio-dot {
+    display: none;
+    width: 8px;
+    height: 8px;
+    background: #1a5c57;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .scale-option.selected .scale-radio { border-color: #1a5c57; }
+  .scale-option.selected .scale-radio-dot { display: block; }
+  .scale-number {
+    font-size: 20px;
+    font-weight: 700;
+    color: #0f172a;
+    display: block;
+  }
+  .scale-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #888;
+    margin-top: 4px;
+  }
+
+  .scale-legend {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 28px;
+  }
+
+  /* ── Quiz navigation ── */
+  .quiz-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* ── Results ── */
+  .results-summary {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .results-overall-score {
+    font-size: 56px;
+    font-weight: 800;
+    color: #1a5c57;
+    line-height: 1;
+  }
+  .results-overall-label {
+    font-size: 14px;
+    color: #888;
+    margin-top: 2px;
+  }
+  .results-tier {
+    display: inline-block;
+    background: #e6f5f3;
+    color: #1a5c57;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 6px 18px;
+    border-radius: 20px;
+    margin-top: 10px;
+  }
+  .radar-wrap {
+    display: flex;
+    justify-content: center;
+    margin: 24px 0;
+  }
+  .dimension-scores {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 24px 0 28px;
+  }
+  .dim-score-card {
+    background: #f7f8fa;
+    border-radius: 8px;
+    padding: 14px 16px;
+    border-left: 4px solid #1a5c57;
+  }
+  .dim-score-card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 2px;
+  }
+  .dim-score-card-value {
+    font-size: 22px;
+    font-weight: 800;
+    color: #1a5c57;
+    display: inline;
+  }
+  .dim-score-card-max {
+    font-size: 13px;
+    color: #aaa;
+  }
+  .dim-score-card-interp {
+    font-size: 12px;
+    color: #777;
+    margin-top: 4px;
+  }
+
+  /* ── Form ── */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .form-group { display: flex; flex-direction: column; }
+  .form-group.full { grid-column: 1 / -1; }
+  .form-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 10px 12px;
+    border: 1px solid #d0d3d9;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    color: #333;
+    background: #fff;
+    transition: border-color 0.2s;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: #1a5c57;
+  }
+  .form-group textarea { resize: vertical; min-height: 70px; }
+  .form-group input::placeholder,
+  .form-group textarea::placeholder { color: #aaa; }
+
+  .form-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+  }
+
+  /* ── Confirmation ── */
+  .confirm-msg { font-size: 15px; color: #555; margin-bottom: 8px; }
+  .confirm-note { font-size: 14px; color: #888; margin-bottom: 28px; }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .header-card { flex-direction: column; gap: 16px; padding: 24px; }
+    .body-grid { flex-direction: column; }
+    .sidebar { width: 100%; min-width: unset; }
+    .main-panel { padding: 24px 20px; }
+    .scale-row { flex-wrap: wrap; gap: 8px; }
+    .scale-option { flex: 0 0 calc(20% - 8px); border-radius: 8px !important; border-right: 1px solid #e2e4e8 !important; }
+    .form-grid { grid-template-columns: 1fr; }
+    .dimension-scores { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- Header -->
+  <div class="header-card">
+    <div>
+      <div class="header-brand">Kauai Framework</div>
+      <h1 class="header-title">Diagnóstico de<br>Prontidão para IA</h1>
+    </div>
+    <div class="header-tagline">
+      Um diagnóstico de liderança para avaliar a prontidão da sua organização para IA e identificar seu próximo passo estratégico.
+    </div>
+  </div>
+
+  <div class="body-grid">
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <h2>Visão da Avaliação</h2>
+      <p>Este diagnóstico avalia sua organização em 8 dimensões críticas de adoção de IA — de estratégia e dados a cultura e ROI.</p>
+      <div class="sidebar-stat">
+        <div class="sidebar-stat-label">Perguntas</div>
+        <div class="sidebar-stat-value">16</div>
+      </div>
+      <div class="sidebar-stat">
+        <div class="sidebar-stat-label">Dimensões</div>
+        <div class="sidebar-stat-value">8</div>
+      </div>
+      <div class="sidebar-stat">
+        <div class="sidebar-stat-label">Tempo Estimado</div>
+        <div class="sidebar-stat-value">5-7 min</div>
+      </div>
+      <div class="sidebar-focus" id="sidebar-focus">
+        Inicie a avaliação para acompanhar seu progresso em tempo real.
+      </div>
+    </div>
+
+    <!-- Main Panel -->
+    <div class="main-panel" id="main"></div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──
+const dimensions = [
+  {
+    name: 'Estratégia & Liderança',
+    description: 'Avalia se a liderança possui uma visão clara de IA, orçamento dedicado e patrocínio executivo para impulsionar a transformação.',
+    questions: [
+      'Nossa equipe executiva definiu uma estratégia clara de IA com objetivos de negócio específicos e prazos.',
+      'Existe um orçamento dedicado e um patrocinador executivo para iniciativas de IA.'
+    ]
+  },
+  {
+    name: 'Prontidão de Dados',
+    description: 'Avalia se sua base de dados — qualidade, acessibilidade e governança — está pronta para suportar cargas de trabalho de IA.',
+    questions: [
+      'Nossos principais dados de negócio são centralizados, bem documentados e acessíveis às equipes que precisam deles.',
+      'Temos políticas de governança de dados cobrindo qualidade, privacidade, segurança e conformidade.'
+    ]
+  },
+  {
+    name: 'Tecnologia & Infraestrutura',
+    description: 'Mede se sua infraestrutura de TI e integrações de sistemas podem suportar a implantação de IA/ML em escala.',
+    questions: [
+      'Nossa infraestrutura de TI (nuvem, computação, APIs) pode suportar cargas de trabalho de IA/ML na escala que precisamos.',
+      'Nossos sistemas de negócio principais estão integrados o suficiente para compartilhar dados entre departamentos.'
+    ]
+  },
+  {
+    name: 'Talentos & Habilidades',
+    description: 'Avalia a profundidade da expertise em IA internamente e a amplitude da alfabetização em IA em toda a organização.',
+    questions: [
+      'Temos membros da equipe com experiência prática em IA/ML — internamente ou por meio de parceiros.',
+      'Funcionários não técnicos foram treinados sobre como usar efetivamente ferramentas de IA em suas funções.'
+    ]
+  },
+  {
+    name: 'Processos & Operações',
+    description: 'Avalia se a IA está incorporada em processos de negócio reais — além de pilotos — com priorização clara de casos de uso.',
+    questions: [
+      'Identificamos e priorizamos processos de negócio específicos onde a IA pode entregar valor mensurável.',
+      'Ferramentas de IA são usadas ativamente em pelo menos alguns fluxos de trabalho de produção hoje — além de apenas pilotos.'
+    ]
+  },
+  {
+    name: 'Governança & Risco',
+    description: 'Mede se sua organização possui políticas, processos de revisão e frameworks de responsabilização para uso responsável de IA.',
+    questions: [
+      'Temos políticas claras para uso responsável de IA, incluindo diretrizes sobre viés, transparência e responsabilização.',
+      'Existe um processo definido de revisão e aprovação antes que sistemas de IA entrem em produção.'
+    ]
+  },
+  {
+    name: 'Cultura & Gestão de Mudanças',
+    description: 'Avalia a abertura organizacional para adoção de IA e se a gestão de mudanças estruturada apoia a implantação.',
+    questions: [
+      'Os funcionários em toda a organização estão geralmente abertos a adotar ferramentas e fluxos de trabalho baseados em IA.',
+      'Temos uma abordagem estruturada de gestão de mudanças ao implementar novas capacidades de IA.'
+    ]
+  },
+  {
+    name: 'Mensuração & ROI',
+    description: 'Avalia se sua organização define, acompanha e pode demonstrar o impacto de negócio dos investimentos em IA.',
+    questions: [
+      'Definimos KPIs e métricas para medir o impacto de negócio das nossas iniciativas de IA.',
+      'Conseguimos demonstrar ROI mensurável de pelo menos uma iniciativa de IA hoje.'
+    ]
+  }
+];
+
+// Flatten questions
+const questions = [];
+dimensions.forEach((dim, di) => {
+  dim.questions.forEach((q, qi) => {
+    questions.push({ dimension: dim.name, dimensionIndex: di, dimensionDescription: dim.description, text: q });
+  });
+});
+
+// ── STATE ──
+let currentScreen = 'start'; // start | quiz | results | form | confirmation
+let currentQuestion = 0;
+let answers = new Array(16).fill(null);
+let formData = {};
+
+const main = document.getElementById('main');
+const sidebarFocus = document.getElementById('sidebar-focus');
+
+// ── RENDER ──
+function render() {
+  switch (currentScreen) {
+    case 'start': renderStart(); break;
+    case 'quiz': renderQuiz(); break;
+    case 'results': renderResults(); break;
+    case 'form': renderForm(); break;
+    case 'confirmation': renderConfirmation(); break;
+  }
+  updateSidebar();
+}
+
+function renderStart() {
+  main.innerHTML = `
+    <h2>Antes de Começar</h2>
+    <p class="start-instructions">
+      Avalie cada afirmação de <b>1 (Não é verdade)</b> a <b>5 (Totalmente verdade)</b> com base na realidade atual da sua organização.
+    </p>
+    <button class="btn btn-primary" onclick="startQuiz()">Iniciar Avaliação</button>
+  `;
+}
+
+function renderQuiz() {
+  const q = questions[currentQuestion];
+  const dimIndex = q.dimensionIndex;
+  const progress = ((currentQuestion + 1) / questions.length) * 100;
+  const isLast = currentQuestion === questions.length - 1;
+  const selected = answers[currentQuestion];
+  const labels = ['Não é verdade', 'Baixo', 'Parcial', 'Quase verdade', 'Totalmente verdade'];
+
+  main.innerHTML = `
+    <div class="quiz-header">
+      <h2>Quiz de Prontidão para IA</h2>
+      <span class="quiz-counter">Pergunta ${currentQuestion + 1} de ${questions.length}</span>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" style="width: ${progress}%"></div>
+    </div>
+    <div class="dimension-badge">Avaliando: ${q.dimension}</div>
+    <div class="question-text">${q.text}</div>
+    <div class="question-sub">Avalie esta afirmação com base na sua organização hoje.</div>
+    <div class="scale-row">
+      ${[1,2,3,4,5].map(v => `
+        <label class="scale-option ${selected === v ? 'selected' : ''}" onclick="selectAnswer(${v})">
+          <input type="radio" name="answer" value="${v}">
+          <span class="scale-radio"><span class="scale-radio-dot"></span></span>
+          <span class="scale-number">${v}</span>
+          <span class="scale-label">${labels[v-1]}</span>
+        </label>
+      `).join('')}
+    </div>
+    <div class="scale-legend">1 = Não é verdade, 5 = Totalmente verdade</div>
+    <div class="quiz-nav">
+      <button class="btn btn-secondary" onclick="prevQuestion()" ${currentQuestion === 0 ? 'style="visibility:hidden"' : ''}>Voltar</button>
+      <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">${isLast ? 'Ver Resultados' : 'Próxima'}</button>
+    </div>
+  `;
+}
+
+function renderResults() {
+  const scores = calculateScores();
+  const overall = scores.reduce((a, b) => a + b, 0) / scores.length;
+  const tier = getTier(overall);
+
+  let dimCards = dimensions.map((dim, i) => {
+    const s = scores[i];
+    const interp = getInterpretation(s);
+    return `
+      <div class="dim-score-card">
+        <div class="dim-score-card-title">${dim.name}</div>
+        <span class="dim-score-card-value">${s.toFixed(1)}</span><span class="dim-score-card-max"> / 5</span>
+        <div class="dim-score-card-interp">${interp}</div>
+      </div>
+    `;
+  }).join('');
+
+  main.innerHTML = `
+    <div class="results-summary">
+      <div class="results-overall-score">${overall.toFixed(1)}</div>
+      <div class="results-overall-label">de 5.0</div>
+      <div class="results-tier">${tier}</div>
+    </div>
+    <div class="radar-wrap">
+      <canvas id="radarCanvas" width="560" height="480"></canvas>
+    </div>
+    <h3 style="font-size:16px; margin-bottom:12px;">Detalhamento por Dimensão</h3>
+    <div class="dimension-scores">${dimCards}</div>
+    <div style="text-align:center">
+      <button class="btn btn-primary" onclick="showForm()">Receber Relatório Completo</button>
+    </div>
+  `;
+
+  drawRadar(scores);
+}
+
+function renderForm() {
+  main.innerHTML = `
+    <h2>Quase Pronto</h2>
+    <p style="font-size:15px; color:#555; margin-bottom:20px;">Preencha seus dados e enviaremos seu relatório de prontidão por e-mail.</p>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Nome Completo</label>
+        <input type="text" id="f_name" placeholder="Maria Silva">
+      </div>
+      <div class="form-group">
+        <label>E-mail</label>
+        <input type="email" id="f_email" placeholder="maria@empresa.com.br">
+      </div>
+      <div class="form-group">
+        <label>Nome da Empresa</label>
+        <input type="text" id="f_company" placeholder="Empresa S.A.">
+      </div>
+      <div class="form-group">
+        <label>Cargo</label>
+        <input type="text" id="f_title" placeholder="Diretor(a) de Operações">
+      </div>
+      <div class="form-group">
+        <label>Setor</label>
+        <select id="f_industry">
+          <option value="">Selecione o setor</option>
+          <option>Tecnologia</option>
+          <option>Serviços Financeiros</option>
+          <option>Saúde</option>
+          <option>Indústria / Manufatura</option>
+          <option>Varejo / E-commerce</option>
+          <option>Serviços Profissionais</option>
+          <option>Educação</option>
+          <option>Mídia & Entretenimento</option>
+          <option>Energia & Utilities</option>
+          <option>Governo</option>
+          <option>Outro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Área de Atuação Principal</label>
+        <select id="f_function">
+          <option value="">Selecione a área</option>
+          <option>Executivo / C-Level</option>
+          <option>Operações</option>
+          <option>TI / Engenharia</option>
+          <option>Vendas / Receita</option>
+          <option>Marketing</option>
+          <option>Financeiro</option>
+          <option>RH / Pessoas</option>
+          <option>Produto</option>
+          <option>Dados / Analytics</option>
+          <option>Outro</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>Porte da Empresa</label>
+        <select id="f_size" style="max-width:300px">
+          <option value="">Selecione o porte</option>
+          <option>1-50 funcionários</option>
+          <option>51-200 funcionários</option>
+          <option>201-1000 funcionários</option>
+          <option>1001-5000 funcionários</option>
+          <option>5000+ funcionários</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>Principal Objetivo com IA (próximos 12 meses)</label>
+        <textarea id="f_goal" placeholder="Exemplo: Melhorar a produtividade de vendas e a precisão de previsões"></textarea>
+      </div>
+      <div class="form-group full">
+        <label>Maior Restrição</label>
+        <textarea id="f_constraint" placeholder="Exemplo: Qualidade dos dados e falta de clareza sobre responsabilidades entre equipes"></textarea>
+      </div>
+    </div>
+    <div class="form-nav">
+      <button class="btn btn-secondary" onclick="showResults()">Voltar aos Resultados</button>
+      <button class="btn btn-primary" onclick="submitForm()">Enviar Meu Relatório</button>
+    </div>
+  `;
+}
+
+function renderConfirmation() {
+  const email = formData.email || 'seu e-mail';
+  main.innerHTML = `
+    <h2>Relatório Enviado</h2>
+    <p class="confirm-msg">Seu relatório de prontidão para IA foi enviado para <b>${email}</b>.</p>
+    <p class="confirm-note">Se não encontrar, verifique a pasta de spam/promoções.</p>
+    <button class="btn btn-primary" onclick="resetAssessment()">Iniciar Nova Avaliação</button>
+  `;
+}
+
+// ── SIDEBAR ──
+function updateSidebar() {
+  if (currentScreen === 'start') {
+    sidebarFocus.textContent = 'Inicie a avaliação para acompanhar seu progresso em tempo real.';
+  } else if (currentScreen === 'quiz') {
+    const q = questions[currentQuestion];
+    const dim = dimensions[q.dimensionIndex];
+    sidebarFocus.innerHTML = `<strong>Foco atual: ${dim.name}.</strong> ${dim.description}`;
+  } else if (currentScreen === 'results') {
+    const scores = calculateScores();
+    const overall = scores.reduce((a, b) => a + b, 0) / scores.length;
+    sidebarFocus.innerHTML = `<strong>Avaliação concluída.</strong> Sua pontuação geral de prontidão é ${overall.toFixed(1)} / 5.0.`;
+  } else if (currentScreen === 'form' || currentScreen === 'confirmation') {
+    sidebarFocus.textContent = currentScreen === 'confirmation' ? 'Relatório enviado por e-mail.' : 'Preencha seus dados para receber o relatório completo.';
+  }
+}
+
+// ── ACTIONS ──
+function startQuiz() {
+  currentScreen = 'quiz';
+  currentQuestion = 0;
+  render();
+}
+
+function selectAnswer(value) {
+  answers[currentQuestion] = value;
+  // Re-render to show selected state
+  renderQuiz();
+  updateSidebar();
+}
+
+function nextQuestion() {
+  if (answers[currentQuestion] === null) {
+    // Highlight that an answer is needed
+    const btn = document.getElementById('nextBtn');
+    btn.textContent = 'Selecione uma nota';
+    btn.style.background = '#c0392b';
+    setTimeout(() => {
+      btn.textContent = currentQuestion === questions.length - 1 ? 'Ver Resultados' : 'Próxima';
+      btn.style.background = '';
+    }, 1200);
+    return;
+  }
+  if (currentQuestion < questions.length - 1) {
+    currentQuestion++;
+    render();
+  } else {
+    currentScreen = 'results';
+    render();
+  }
+}
+
+function prevQuestion() {
+  if (currentQuestion > 0) {
+    currentQuestion--;
+    render();
+  }
+}
+
+function showForm() { currentScreen = 'form'; render(); }
+function showResults() { currentScreen = 'results'; render(); }
+
+function submitForm() {
+  const name = document.getElementById('f_name').value.trim();
+  const email = document.getElementById('f_email').value.trim();
+  if (!name || !email) {
+    alert('Por favor, preencha pelo menos seu nome e e-mail.');
+    return;
+  }
+  formData = {
+    name, email,
+    company: document.getElementById('f_company').value.trim(),
+    title: document.getElementById('f_title').value.trim(),
+    industry: document.getElementById('f_industry').value,
+    jobFunction: document.getElementById('f_function').value,
+    size: document.getElementById('f_size').value,
+    goal: document.getElementById('f_goal').value.trim(),
+    constraint: document.getElementById('f_constraint').value.trim(),
+    scores: calculateScores(),
+    answers: [...answers]
+  };
+  // In production, this would POST to a backend
+  console.log('Assessment submission:', formData);
+  currentScreen = 'confirmation';
+  render();
+}
+
+function resetAssessment() {
+  currentScreen = 'start';
+  currentQuestion = 0;
+  answers = new Array(16).fill(null);
+  formData = {};
+  render();
+}
+
+// ── SCORING ──
+function calculateScores() {
+  return dimensions.map((dim, i) => {
+    const a1 = answers[i * 2] || 0;
+    const a2 = answers[i * 2 + 1] || 0;
+    return (a1 + a2) / 2;
+  });
+}
+
+function getTier(score) {
+  if (score < 2) return 'Estágio Inicial';
+  if (score < 3) return 'Fundacional';
+  if (score < 4) return 'Em Desenvolvimento';
+  if (score <= 4.5) return 'Avançado';
+  return 'Líder';
+}
+
+function getInterpretation(score) {
+  if (score < 2) return 'Lacunas significativas — necessita trabalho de base.';
+  if (score < 3) return 'Progresso inicial — blocos fundamentais ainda faltando.';
+  if (score < 4) return 'Base sólida — espaço para amadurecer.';
+  if (score <= 4.5) return 'Capacidade forte — otimizar e escalar.';
+  return 'Referência no mercado — manter e inovar.';
+}
+
+// ── RADAR CHART ──
+function drawRadar(scores) {
+  const canvas = document.getElementById('radarCanvas');
+  if (!canvas) return;
+  const dpr = window.devicePixelRatio || 1;
+  const cssW = 560, cssH = 480;
+  canvas.width = cssW * dpr;
+  canvas.height = cssH * dpr;
+  canvas.style.width = cssW + 'px';
+  canvas.style.height = cssH + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const cx = cssW / 2;
+  const cy = cssH / 2;
+  const maxR = 150;
+  const levels = 5;
+  const n = dimensions.length;
+  const angleStep = (2 * Math.PI) / n;
+  const startAngle = -Math.PI / 2;
+
+  ctx.clearRect(0, 0, cssW, cssH);
+
+  // Draw grid rings
+  for (let l = 1; l <= levels; l++) {
+    const r = (l / levels) * maxR;
+    ctx.beginPath();
+    for (let i = 0; i <= n; i++) {
+      const angle = startAngle + i * angleStep;
+      const x = cx + r * Math.cos(angle);
+      const y = cy + r * Math.sin(angle);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = l === levels ? '#ccc' : '#e8eaed';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    if (l < levels) {
+      ctx.fillStyle = '#bbb';
+      ctx.font = '10px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(l, cx + 3, cy - (l / levels) * maxR + 11);
+    }
+  }
+
+  // Draw axes
+  for (let i = 0; i < n; i++) {
+    const angle = startAngle + i * angleStep;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + maxR * Math.cos(angle), cy + maxR * Math.sin(angle));
+    ctx.strokeStyle = '#ddd';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  // Draw data polygon
+  ctx.beginPath();
+  for (let i = 0; i <= n; i++) {
+    const idx = i % n;
+    const angle = startAngle + idx * angleStep;
+    const r = (scores[idx] / levels) * maxR;
+    const x = cx + r * Math.cos(angle);
+    const y = cy + r * Math.sin(angle);
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(26, 92, 87, 0.18)';
+  ctx.fill();
+  ctx.strokeStyle = '#1a5c57';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // Draw dots
+  for (let i = 0; i < n; i++) {
+    const angle = startAngle + i * angleStep;
+    const r = (scores[i] / levels) * maxR;
+    const x = cx + r * Math.cos(angle);
+    const y = cy + r * Math.sin(angle);
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, 2 * Math.PI);
+    ctx.fillStyle = '#1a5c57';
+    ctx.fill();
+  }
+
+  // Draw labels with proper positioning
+  ctx.fillStyle = '#333';
+  ctx.font = '600 11px -apple-system, BlinkMacSystemFont, sans-serif';
+  ctx.textBaseline = 'middle';
+
+  const labelNames = dimensions.map(d => d.name);
+
+  for (let i = 0; i < n; i++) {
+    const angle = startAngle + i * angleStep;
+    const cosA = Math.cos(angle);
+    const sinA = Math.sin(angle);
+    const labelR = maxR + 22;
+    let x = cx + labelR * cosA;
+    let y = cy + labelR * sinA;
+
+    // Set text alignment based on quadrant
+    if (cosA > 0.15) { ctx.textAlign = 'left'; x += 6; }
+    else if (cosA < -0.15) { ctx.textAlign = 'right'; x -= 6; }
+    else { ctx.textAlign = 'center'; }
+
+    // Adjust vertical position for top/bottom labels
+    if (sinA < -0.7) y -= 4;
+    if (sinA > 0.7) y += 4;
+
+    // Split into two lines at the midpoint of characters
+    const name = labelNames[i];
+    const words = name.split(' ');
+    let line1, line2;
+    if (words.length <= 2) {
+      line1 = name; line2 = '';
+    } else {
+      // Find the split point closest to the middle
+      let bestSplit = 1, bestDiff = Infinity;
+      for (let s = 1; s < words.length; s++) {
+        const l1 = words.slice(0, s).join(' ');
+        const l2 = words.slice(s).join(' ');
+        const diff = Math.abs(l1.length - l2.length);
+        if (diff < bestDiff) { bestDiff = diff; bestSplit = s; }
+      }
+      line1 = words.slice(0, bestSplit).join(' ');
+      line2 = words.slice(bestSplit).join(' ');
+    }
+
+    if (line2) {
+      ctx.fillText(line1, x, y - 7);
+      ctx.fillText(line2, x, y + 7);
+    } else {
+      ctx.fillText(name, x, y);
+    }
+  }
+}
+
+// ── INIT ──
+render();
+</script>
+</body>
+</html>
